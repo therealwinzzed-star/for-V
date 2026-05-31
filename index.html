@@ -3,18 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <title>Таймеры для Вари</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f0f7ff;
+        }
+        .timer-container {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        h2 {
+            color: #ff6b6b;
+            margin-top: 0;
+        }
+        iframe {
+            width: 100%;
+            min-height: 400px;
+            border: none;
+            border-radius: 10px;
+        }
+        .note {
+            text-align: center;
+            color: #666;
+            margin-top: 30px;
+            font-size: 14px;
+        }
+    </style>
 </head>
 <body>
 
-    <div>
-        <a href="https://allcalc.ru/node/1870">Сколько дней осталось до лета - сделал для Вари)</a>
+    <div class="timer-container">
+        <h2>📅 Сколько дней осталось до лета</h2>
+        <iframe src="https://allcalc.ru/node/1870" frameborder="0"></iframe>
+        <p>✨ Таймер специально для Вари ✨</p>
     </div>
 
-    <div>
-        <a href="https://allcalc.ru/node/2336">Сколько дней осталось до 21 июня - тоже для Вари</a>
+    <div class="timer-container">
+        <h2>📅 Сколько дней осталось до 21 июня</h2>
+        <iframe src="https://allcalc.ru/node/2336" frameborder="0"></iframe>
+        <p>🎂 Чтобы Варя не забыла про праздник 🎂</p>
     </div>
 
-    <script src="https://allcalc.ru/widgets/script.js"></script>
+    <div class="note">
+        💡 Если таймеры не отображаются — отключи блокировщик рекламы на этой странице
+    </div>
 
 </body>
 </html>
