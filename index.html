@@ -1,2 +1,125 @@
-<div><a href="https://allcalc.ru/node/2317" data-weight="450px" data-height="400px">Сколько дней осталось до 1 июня - для Вари</a><script src="https://allcalc.ru/widgets/script.js"></script></div>
-<div><a href="https://allcalc.ru/node/2336" data-weight="450px" data-height="400px">Сколько дней осталось до 21 июня - для Вари</a><script src="https://allcalc.ru/widgets/script.js"></script></div>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Обратный отсчет для Вари</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        
+        .widget-container {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .code-checker {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border: 2px solid #4caf50;
+        }
+        
+        .code-checker label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .code-checker input {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        
+        .code-checker input:focus {
+            outline: none;
+            border-color: #4caf50;
+        }
+        
+        .output-text {
+            margin-top: 15px;
+            padding: 20px;
+            background: #fff8e1;
+            border-left: 4px solid #ff9800;
+            border-radius: 5px;
+            font-size: 16px;
+            line-height: 1.6;
+            color: #333;
+            font-family: 'Georgia', serif;
+            display: none;
+            white-space: pre-line;
+        }
+        
+        .output-text.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+<h1>📅 Обратный отсчет для Вари</h1>
+
+<div class="code-checker">
+    <label>🔑 Введите код:</label>
+    <input type="text" id="codeInput">
+    <div id="testTextOutput" class="output-text"></div>
+</div>
+
+<div class="widget-container">
+    <div><a href="https://allcalc.ru/node/2317" data-weight="450px" data-height="400px">Сколько дней осталось до 1 июня - для Вари</a><script src="https://allcalc.ru/widgets/script.js"></script></div>
+</div>
+
+<div class="widget-container">
+    <div><a href="https://allcalc.ru/node/2336" data-weight="450px" data-height="400px">Сколько дней осталось до 21 июня - для Вари</a><script src="https://allcalc.ru/widgets/script.js"></script></div>
+</div>
+
+<div class="widget-container">
+    <div><a href="https://allcalc.ru/node/2392" data-weight="450px" data-height="400px">Сколько дней осталось до 16 августа - allcalc</a><script src="https://allcalc.ru/widgets/script.js"></script></div>
+</div>
+
+<script>
+    const inputField = document.getElementById('codeInput');
+    const outputDiv = document.getElementById('testTextOutput');
+    
+    function checkCode() {
+        if (inputField.value.trim() === '16-08-13') {
+            outputDiv.innerHTML = `Я считаю дни до нашей встречи,
+Звёзды в небе делят нас с тобой.
+Ты просила — я сложил в куплеты
+Всё, что сердце шепчет в час ночной.
+
+Знай, когда ты там смеёшься с кем-то,
+Или смотришь молча на костёр, —
+Я лечу к тебе быстрее ветра,
+Мыслями касаюсь твоих гор.
+
+Возвращайся. Жду. Скучаю дико.
+Ты мой приз и мой законный трофей.
+Ты — моя любимая улика,
+Что любовь сильнее всех вещей.`;
+            outputDiv.classList.add('show');
+        } else {
+            outputDiv.classList.remove('show');
+            outputDiv.innerHTML = '';
+        }
+    }
+    
+    inputField.addEventListener('input', checkCode);
+</script>
+
+</body>
+</html>
