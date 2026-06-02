@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>💬 Только я и Варя</title>
+    <title>💬 Я и Варя</title>
     <style>
         * {
             margin: 0;
@@ -28,6 +28,10 @@
             border-radius: 28px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 90vh;
+            max-height: 700px;
         }
 
         .header {
@@ -49,14 +53,14 @@
 
         .connection-status {
             background: #f0f0f0;
-            padding: 8px 20px;
-            font-size: 12px;
+            padding: 6px 20px;
+            font-size: 11px;
             text-align: center;
             border-bottom: 1px solid #ddd;
         }
 
         .messages {
-            height: 400px;
+            flex: 1;
             overflow-y: auto;
             padding: 15px;
             background: #faf9f8;
@@ -161,40 +165,6 @@
             cursor: not-allowed;
         }
 
-        .waiting-screen {
-            padding: 60px 20px;
-            text-align: center;
-        }
-
-        .waiting-screen .loader {
-            width: 50px;
-            height: 50px;
-            border: 3px solid #e9ecef;
-            border-top: 3px solid #667eea;
-            border-radius: 50%;
-            margin: 0 auto 20px;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .waiting-screen h2 {
-            color: #333;
-            margin-bottom: 10px;
-        }
-
-        .waiting-screen p {
-            color: #888;
-            font-size: 14px;
-        }
-
-        .hidden {
-            display: none;
-        }
-
         .messages::-webkit-scrollbar {
             width: 6px;
         }
@@ -210,61 +180,55 @@
     </style>
 </head>
 <body>
-    <div class="container" id="app">
-        <!-- Экран ожидания -->
-        <div id="waitingScreen">
-            <div class="header">
-                <h1>💬 Я 💜 Варя</h1>
-                <p>наш личный чат</p>
-            </div>
-            <div class="waiting-screen">
-                <div class="loader"></div>
-                <h2>Ожидание Вари...</h2>
-                <p>Как только Варя зайдёт — чат начнётся сам</p>
-                <p style="margin-top: 15px; font-size: 12px;">⚡ Соединение напрямую, без серверов</p>
-            </div>
+    <div class="container">
+        <div class="header">
+            <h1>💬 Я 💜 Варя</h1>
+            <p>наш личный чат</p>
         </div>
-
-        <!-- Экран чата -->
-        <div id="chatScreen" class="hidden">
-            <div class="header">
-                <h1>💬 Я 💜 Варя</h1>
-                <p id="chatStatus">Варя здесь! 💕</p>
-            </div>
-            <div class="connection-status" id="connStatus">
-                ✅ Соединение установлено
-            </div>
-            <div class="messages" id="messages"></div>
-            <div class="typing-indicator" id="typingIndicator"></div>
-            <div class="input-area">
-                <input type="text" id="messageInput" placeholder="Напиши Варе..." onkeypress="handleKeyPress(event)" disabled>
-                <button id="sendBtn" onclick="sendMessage()" disabled>📤</button>
-            </div>
+        <div class="connection-status" id="connStatus">
+            🔄 Подключение...
+        </div>
+        <div class="messages" id="messages"></div>
+        <div class="typing-indicator" id="typingIndicator"></div>
+        <div class="input-area">
+            <input type="text" id="messageInput" placeholder="Напиши Варе..." onkeypress="handleKeyPress(event)" disabled>
+            <button id="sendBtn" onclick="sendMessage()" disabled>📤</button>
         </div>
     </div>
 
     <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
     <script>
-        // ============ ВАЖНО: УНИКАЛЬНЫЙ ID КОМНАТЫ ============
-        // Замени "YaIVarya" на что-то только ваше, что знаете только вы двое
-        // Например: "VaryaMyLove2024" или "НашСекретныйКод"
-        const SECRET_ROOM = "";
-        // =====================================================
+        // Генерируем уникальный ID для этой пары устройств
+        // Он будет одинаковым для вас двоих, но разным для других людей
+        function getPairId() {
+            // Используем localStorage, чтобы ID сохранялся
+            let pairId = localStorage.getItem('chat_pair_id');
+            if (!pairId) {
+                // Генерируем случайный ID при первом запуске
+                pairId = 'pair_' + Math.random().toString(36).substring(2, 15);
+                localStorage.setItem('chat_pair_id', pairId);
+            }
+            return pairId;
+        }
+        
+        const ROOM_ID = getPairId();
         
         let peer = null;
         let connection = null;
         let connected = false;
         let typingTimeout = null;
         
-        // DOM элементы
-        const waitingScreen = document.getElementById('waitingScreen');
-        const chatScreen = document.getElementById('chatScreen');
         const messagesDiv = document.getElementById('messages');
         const typingIndicator = document.getElementById('typingIndicator');
         const messageInput = document.getElementById('messageInput');
         const sendBtn = document.getElementById('sendBtn');
+        const connStatus = document.getElementById('connStatus');
         
-        // Добавляем сообщение в чат
+        function updateStatus(text, isError = false) {
+            connStatus.innerHTML = isError ? `❌ ${text}` : `✅ ${text}`;
+            connStatus.style.color = isError ? '#f44336' : '#4caf50';
+        }
+        
         function addMessage(text, isSystem = false, isMe = false) {
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${isSystem ? 'system' : (isMe ? 'me' : 'her')}`;
@@ -301,11 +265,7 @@
             const text = messageInput.value.trim();
             if (!text || !connected || !connection) return;
             
-            connection.send({
-                type: 'message',
-                text: text
-            });
-            
+            connection.send({ type: 'message', text: text });
             addMessage(text, false, true);
             messageInput.value = '';
             stopTyping();
@@ -335,6 +295,9 @@
         }
         
         function setupConnection(conn) {
+            if (connection === conn) return;
+            if (connection) connection.close();
+            
             connection = conn;
             
             connection.on('open', () => {
@@ -342,12 +305,8 @@
                 sendBtn.disabled = false;
                 messageInput.disabled = false;
                 messageInput.focus();
-                
-                // Переключаем экран
-                waitingScreen.classList.add('hidden');
-                chatScreen.classList.remove('hidden');
-                
-                addMessage("💕 Варя здесь! Давай общаться 💬", true);
+                updateStatus('Соединено 💕');
+                addMessage("Привет! 💬", true);
             });
             
             connection.on('data', (data) => {
@@ -362,31 +321,22 @@
                 connected = false;
                 sendBtn.disabled = true;
                 messageInput.disabled = true;
-                addMessage("💔 Варя вышла из чата... Ждём её возвращения", true);
-                
-                // Показываем экран ожидания
-                chatScreen.classList.add('hidden');
-                waitingScreen.classList.remove('hidden');
-                
-                // Пытаемся переподключиться
-                setTimeout(() => {
-                    if (!connected && peer) {
-                        reconnect();
-                    }
-                }, 3000);
+                updateStatus('Нет соединения', true);
+                addMessage("Связь потеряна. Обнови страницу, если Варя рядом.", true);
+                connection = null;
             });
         }
         
-        function reconnect() {
-            if (!peer) return;
-            const conn = peer.connect(SECRET_ROOM);
+        function tryConnect() {
+            if (connection && connected) return;
+            const conn = peer.connect(ROOM_ID);
             if (conn) {
                 setupConnection(conn);
             }
         }
         
-        // ============ ЗАПУСК ============
-        peer = new Peer(SECRET_ROOM, {
+        // ЗАПУСК
+        peer = new Peer(ROOM_ID, {
             config: {
                 iceServers: [
                     { urls: 'stun:stun.l.google.com:19302' },
@@ -395,36 +345,22 @@
             }
         });
         
-        peer.on('open', (id) => {
-            console.log('Peer ID:', id);
+        peer.on('open', () => {
+            updateStatus('Поиск Вари...');
             
-            // Ждём, если кто-то подключится к нам
             peer.on('connection', (conn) => {
                 setupConnection(conn);
             });
             
-            // Пытаемся подключиться к существующей комнате
-            setTimeout(() => {
-                const conn = peer.connect(SECRET_ROOM);
-                if (conn) {
-                    setTimeout(() => {
-                        if (!connected) {
-                            setupConnection(conn);
-                        }
-                    }, 500);
-                }
-            }, 1000);
+            tryConnect();
         });
         
         peer.on('error', (err) => {
-            console.error('Ошибка:', err);
-            
-            // Если комната занята или не найдена — пробуем подключиться
             if (err.type === 'peer-unavailable') {
-                const conn = peer.connect(SECRET_ROOM);
-                if (conn) {
-                    setupConnection(conn);
-                }
+                tryConnect();
+            } else {
+                updateStatus('Ошибка подключения', true);
+                console.error(err);
             }
         });
     </script>
