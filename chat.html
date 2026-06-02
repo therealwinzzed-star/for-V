@@ -1,84 +1,432 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Сайт специально для Вари</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>💬 Только я и Варя</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 50px auto;
-            padding: 20px;
-            background: #f0f0f0;
-        }
-        
-        .widget-container {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        
-        .code-checker {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            border: 2px solid #4caf50;
-        }
-        
-        .code-checker label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-            color: #333;
-        }
-        
-        .code-checker input {
-            width: 100%;
-            padding: 10px;
-            font-size: 16px;
-            border: 2px solid #ddd;
-            border-radius: 5px;
+        * {
+            margin: 0;
+            padding: 0;
             box-sizing: border-box;
         }
-        
-        .code-checker input:focus {
-            outline: none;
-            border-color: #4caf50;
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
         }
-        
-        .output-text {
-            margin-top: 15px;
+
+        .container {
+            width: 100%;
+            max-width: 550px;
+            background: white;
+            border-radius: 28px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
             padding: 20px;
-            background: #fff8e1;
-            border-left: 4px solid #ff9800;
-            border-radius: 5px;
-            font-size: 16px;
-            line-height: 1.6;
-            color: #333;
-            font-family: 'Georgia', serif;
-            display: none;
-            white-space: pre-line;
+            text-align: center;
         }
-        
-        .output-text.show {
-            display: block;
+
+        .header h1 {
+            font-size: 22px;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .connection-status {
+            background: #f0f0f0;
+            padding: 8px 20px;
+            font-size: 12px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .messages {
+            height: 400px;
+            overflow-y: auto;
+            padding: 15px;
+            background: #faf9f8;
+        }
+
+        .message {
+            margin-bottom: 12px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message.system {
+            align-items: center;
+        }
+
+        .message.system .bubble {
+            background: #e0e0e0;
+            color: #555;
+            font-size: 11px;
+            padding: 5px 12px;
+            border-radius: 20px;
+        }
+
+        .message.me {
+            align-items: flex-end;
+        }
+
+        .message.me .bubble {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 18px 18px 4px 18px;
+        }
+
+        .message.her .bubble {
+            background: #e9ecef;
+            color: #333;
+            border-radius: 18px 18px 18px 4px;
+        }
+
+        .bubble {
+            max-width: 75%;
+            padding: 10px 14px;
+            word-wrap: break-word;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .meta {
+            font-size: 10px;
+            color: #888;
+            margin-top: 3px;
+            margin-bottom: 3px;
+        }
+
+        .message.me .meta {
+            text-align: right;
+        }
+
+        .typing-indicator {
+            padding: 8px 15px;
+            font-size: 11px;
+            color: #888;
+            font-style: italic;
+            background: white;
+            border-top: 1px solid #eee;
+            min-height: 36px;
+        }
+
+        .input-area {
+            display: flex;
+            padding: 12px 15px;
+            background: white;
+            border-top: 1px solid #eee;
+            gap: 10px;
+        }
+
+        .input-area input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .input-area input:focus {
+            border-color: #667eea;
+        }
+
+        .input-area button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 0 22px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .input-area button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .waiting-screen {
+            padding: 60px 20px;
+            text-align: center;
+        }
+
+        .waiting-screen .loader {
+            width: 50px;
+            height: 50px;
+            border: 3px solid #e9ecef;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .waiting-screen h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .waiting-screen p {
+            color: #888;
+            font-size: 14px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .messages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .messages::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .messages::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 3px;
         }
     </style>
 </head>
 <body>
+    <div class="container" id="app">
+        <!-- Экран ожидания -->
+        <div id="waitingScreen">
+            <div class="header">
+                <h1>💬 Я 💜 Варя</h1>
+                <p>наш личный чат</p>
+            </div>
+            <div class="waiting-screen">
+                <div class="loader"></div>
+                <h2>Ожидание Вари...</h2>
+                <p>Как только Варя зайдёт — чат начнётся сам</p>
+                <p style="margin-top: 15px; font-size: 12px;">⚡ Соединение напрямую, без серверов</p>
+            </div>
+        </div>
 
-<div class="widget-container">
-    <script 
-    src="https://api.ghostchat.dev/widget.js" 
-    data-site="clb77d8fbc1e2241a8885693f1" 
-    data-position="bottom-right"
-    data-primary-color="#ff69b4"
-    data-welcome-message="Привет👋"
-    async>
+        <!-- Экран чата -->
+        <div id="chatScreen" class="hidden">
+            <div class="header">
+                <h1>💬 Я 💜 Варя</h1>
+                <p id="chatStatus">Варя здесь! 💕</p>
+            </div>
+            <div class="connection-status" id="connStatus">
+                ✅ Соединение установлено
+            </div>
+            <div class="messages" id="messages"></div>
+            <div class="typing-indicator" id="typingIndicator"></div>
+            <div class="input-area">
+                <input type="text" id="messageInput" placeholder="Напиши Варе..." onkeypress="handleKeyPress(event)" disabled>
+                <button id="sendBtn" onclick="sendMessage()" disabled>📤</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+    <script>
+        // ============ ВАЖНО: УНИКАЛЬНЫЙ ID КОМНАТЫ ============
+        // Замени "YaIVarya" на что-то только ваше, что знаете только вы двое
+        // Например: "VaryaMyLove2024" или "НашСекретныйКод"
+        const SECRET_ROOM = "";
+        // =====================================================
+        
+        let peer = null;
+        let connection = null;
+        let connected = false;
+        let typingTimeout = null;
+        
+        // DOM элементы
+        const waitingScreen = document.getElementById('waitingScreen');
+        const chatScreen = document.getElementById('chatScreen');
+        const messagesDiv = document.getElementById('messages');
+        const typingIndicator = document.getElementById('typingIndicator');
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+        
+        // Добавляем сообщение в чат
+        function addMessage(text, isSystem = false, isMe = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isSystem ? 'system' : (isMe ? 'me' : 'her')}`;
+            
+            if (isSystem) {
+                messageDiv.innerHTML = `<div class="bubble">${escapeHtml(text)}</div>`;
+            } else if (isMe) {
+                messageDiv.innerHTML = `
+                    <div class="meta">Я • ${new Date().toLocaleTimeString().slice(0,5)}</div>
+                    <div class="bubble">${escapeHtml(text)}</div>
+                `;
+            } else {
+                messageDiv.innerHTML = `
+                    <div class="meta">Варя • ${new Date().toLocaleTimeString().slice(0,5)}</div>
+                    <div class="bubble">${escapeHtml(text)}</div>
+                `;
+            }
+            
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function showTyping(isTyping) {
+            typingIndicator.innerHTML = isTyping ? "Варя печатает... ✍️" : "";
+        }
+        
+        function sendMessage() {
+            const text = messageInput.value.trim();
+            if (!text || !connected || !connection) return;
+            
+            connection.send({
+                type: 'message',
+                text: text
+            });
+            
+            addMessage(text, false, true);
+            messageInput.value = '';
+            stopTyping();
+        }
+        
+        function handleKeyPress(event) {
+            if (event.key === 'Enter' && connected) {
+                sendMessage();
+            } else if (connected) {
+                startTyping();
+            }
+        }
+        
+        function startTyping() {
+            if (!connected || !connection) return;
+            if (typingTimeout) clearTimeout(typingTimeout);
+            
+            connection.send({ type: 'typing', isTyping: true });
+            typingTimeout = setTimeout(() => {
+                stopTyping();
+            }, 1500);
+        }
+        
+        function stopTyping() {
+            if (!connected || !connection) return;
+            connection.send({ type: 'typing', isTyping: false });
+        }
+        
+        function setupConnection(conn) {
+            connection = conn;
+            
+            connection.on('open', () => {
+                connected = true;
+                sendBtn.disabled = false;
+                messageInput.disabled = false;
+                messageInput.focus();
+                
+                // Переключаем экран
+                waitingScreen.classList.add('hidden');
+                chatScreen.classList.remove('hidden');
+                
+                addMessage("💕 Варя здесь! Давай общаться 💬", true);
+            });
+            
+            connection.on('data', (data) => {
+                if (data.type === 'message') {
+                    addMessage(data.text, false, false);
+                } else if (data.type === 'typing') {
+                    showTyping(data.isTyping);
+                }
+            });
+            
+            connection.on('close', () => {
+                connected = false;
+                sendBtn.disabled = true;
+                messageInput.disabled = true;
+                addMessage("💔 Варя вышла из чата... Ждём её возвращения", true);
+                
+                // Показываем экран ожидания
+                chatScreen.classList.add('hidden');
+                waitingScreen.classList.remove('hidden');
+                
+                // Пытаемся переподключиться
+                setTimeout(() => {
+                    if (!connected && peer) {
+                        reconnect();
+                    }
+                }, 3000);
+            });
+        }
+        
+        function reconnect() {
+            if (!peer) return;
+            const conn = peer.connect(SECRET_ROOM);
+            if (conn) {
+                setupConnection(conn);
+            }
+        }
+        
+        // ============ ЗАПУСК ============
+        peer = new Peer(SECRET_ROOM, {
+            config: {
+                iceServers: [
+                    { urls: 'stun:stun.l.google.com:19302' },
+                    { urls: 'stun:stun1.l.google.com:19302' }
+                ]
+            }
+        });
+        
+        peer.on('open', (id) => {
+            console.log('Peer ID:', id);
+            
+            // Ждём, если кто-то подключится к нам
+            peer.on('connection', (conn) => {
+                setupConnection(conn);
+            });
+            
+            // Пытаемся подключиться к существующей комнате
+            setTimeout(() => {
+                const conn = peer.connect(SECRET_ROOM);
+                if (conn) {
+                    setTimeout(() => {
+                        if (!connected) {
+                            setupConnection(conn);
+                        }
+                    }, 500);
+                }
+            }, 1000);
+        });
+        
+        peer.on('error', (err) => {
+            console.error('Ошибка:', err);
+            
+            // Если комната занята или не найдена — пробуем подключиться
+            if (err.type === 'peer-unavailable') {
+                const conn = peer.connect(SECRET_ROOM);
+                if (conn) {
+                    setupConnection(conn);
+                }
+            }
+        });
     </script>
-</div>
-
+</body>
+</html>
